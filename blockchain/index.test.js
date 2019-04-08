@@ -1,4 +1,4 @@
-const Chain = require('./chain');
+const Chain = require('./index');
 const Block = require('./block');
 
 describe('Chain', () =>{
