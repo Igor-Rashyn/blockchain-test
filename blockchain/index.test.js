@@ -1,51 +1,109 @@
-const Chain = require('./index');
+const Blockchain = require('./index');
 const Block = require('./block');
 
-describe('Chain', () =>{
-    let bc, bc2;
+describe('Blockchain', () =>{
+    let blockchain, newChain, originalChain;
 
     beforeEach(() => {
-        bc = new Chain();
-        bc2 = new Chain();
+        blockchain = new Blockchain();
+        newChain = new Blockchain();
+
+        originalChain = blockchain.chain;
+    })
+
+    it('contains a `chain` Array instance', () => {
+        expect(blockchain.chain instanceof Array).toBe(true);
     });
 
-    // it('start with genesis block', () => {
-    //     expect(bc.chain[0]).toEqual(Block.genesis());
-    // });
-
-    it('adds a new block', () => {
-        const data = 'foo';
-        bc.addBlock(data);
-        expect(bc.chain[bc.chain.length-1].data).toEqual(data);
+    it('starts with the genesis block', () => {
+        expect(blockchain.chain[0]).toEqual(Block.genesis());
     });
 
-    it('validates a valid chain', () => {
-        bc2.addBlock('foo');
-        expect(bc.isValid(bc2.chain)).toBe(true);
+    it('adds a new block to the chain', () => {
+        const newData = 'test';
+        blockchain.addBlock({data: newData})
+        expect(blockchain.chain[blockchain.chain.length - 1].data).toEqual(newData);
     });
 
-    it('invalidates a chain with a corrupt genesis block', () => {
-        bc2.chain[0].data = 'bad data';
-        expect(bc.isValid(bc2.chain)).toBe(false);
+    describe('isValid', () => {
+        describe('when the chain does not start with the genesis block', () =>{
+            it('returns false', () => {
+                blockchain.chain[0] = {data: 'fake'};
+                expect(Blockchain.isValid(blockchain.chain)).toBe(false);
+            });
+        });
+
+        describe('when the chain startd with the genesis block and has multiple blocks', () =>{
+            beforeEach(() => {
+                blockchain.addBlock({data: 'first'});
+                blockchain.addBlock({data: 'second'});
+                blockchain.addBlock({data: 'third'});
+            });
+
+            describe('and a lastHash reference has changed', () => {
+                it('returns false', () => {
+                    blockchain.chain[2].lastHash = 'brocken-hash';
+                    expect(Blockchain.isValid(blockchain.chain)).toBe(false);
+                })
+            });
+            describe('and the chain contains a block with an invalid field', () => {
+                it('returns false', () => {
+                    blockchain.chain[2].data = 'brocken-data';
+                    expect(Blockchain.isValid(blockchain.chain)).toBe(false);
+                })
+            });
+            describe('and the chain does not contain any invalid blocks', () => {
+                it('returns true', () => {
+                    expect(Blockchain.isValid(blockchain.chain)).toBe(true);
+                })
+            });
+        });
     });
 
-    it('invalidates a corrupt chain', () => {
-        bc2.addBlock('foo');
-        bc2.chain[1].data = 'not foo';
-        expect(bc.isValid(bc2.chain)).toBe(false);
-    });
+    describe('replace chain', () => {
+        let errorMock, logMock;
 
-    if('replaces the chain with a valid chain', () =>{
-        bc2.addBlock('goo');
-        bc.replace(bc2.chain);
+        beforeEach(() => {
+            errorMock = jest.fn();
+            logMock = jest.fn();
 
-        expect(bc.chain).toEqual(bc2.chain);
-    });
+            global.console.error = errorMock;
+            global.console.log = logMock;
+        })
 
-    if('does not replace the chain with one of less than or equal to length', () =>{
-       bc.addBlock('foo');
-       bc.replace(bc2.chain);
-       expect(bc.chain).not.toEqual(bc2.chain) 
-    });
+        describe('when the new chain is not longer', () => {
+            it('does not replace the chain', () => {
+                newChain.chain[0] = { new : 'chain'};
 
+                blockchain.replace(newChain.chain);
+
+                expect(blockchain.chain).toEqual(originalChain);
+            });
+        });
+
+        describe('when the chain is longer', () => {
+            beforeEach(() => {
+                newChain.addBlock({data: 'first'});
+                newChain.addBlock({data: 'second'});
+                newChain.addBlock({data: 'third'});
+            });
+
+           describe('and the chain is invalid', () => {
+            it('does not replace the chain', () => {
+                newChain.chain[2].hash = 'fake-hash';
+                blockchain.replace(newChain.chain);
+
+                expect(blockchain.chain).toEqual(originalChain);
+            });
+           })
+
+           describe('and the chain is valid', () => {
+            it('replaces the chain', () => {
+                blockchain.replace(newChain.chain);
+
+                expect(blockchain.chain).toEqual(newChain.chain);
+            });
+           });
+        });
+    })
 });
