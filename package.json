@@ -10,6 +10,9 @@
     "dev": "nodemon ./app",
     "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon ./app"
   },
+  "jest":{
+    "testEnvironment": "node"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,6 +24,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "crypto-js": "^3.1.9-1",
+    "elliptic": "^6.4.1",
     "express": "^4.16.4",
     "hex-to-binary": "^1.0.1",
     "redis": "^2.8.0",
