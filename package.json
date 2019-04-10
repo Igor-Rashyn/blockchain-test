@@ -7,12 +7,14 @@
     "test": "jest --watchAll",
     "dev-test": "nodemon dev-test",
     "start": "node ./app",
-    "dev": "nodemon ./app"
+    "dev": "nodemon ./app",
+    "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon ./app"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^5.2.0",
     "jest": "^24.7.1",
     "nodemon": "^1.18.10"
   },
@@ -22,6 +24,7 @@
     "express": "^4.16.4",
     "hex-to-binary": "^1.0.1",
     "redis": "^2.8.0",
+    "request": "^2.88.0",
     "ws": "^6.2.1"
   }
 }
