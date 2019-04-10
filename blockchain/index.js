@@ -22,11 +22,11 @@ class Blockchain {
             const lastBlockDifficulty = chain[i-1].difficulty;
             const lastBlockHash = chain[i-1].hash;
             const { timestamp, lastHash, hash, nonce, difficulty, data} = chain[i];
-            if((lastBlockDifficulty - difficulty) > 1) return false;
+
+            if( Math.abs(lastBlockDifficulty - difficulty) > 1) return false;
             if(lastHash !== lastBlockHash) return false;
 
             const validatedHash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
-
             if(hash !== validatedHash) return false;
         }
 
