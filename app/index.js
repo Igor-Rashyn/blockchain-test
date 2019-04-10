@@ -10,6 +10,7 @@ const HTTP_PORT = 3000;
 const ROOT_NODE_ADDRESS = `http://localhost:${HTTP_PORT}`;
 let PEER_PORT;
 if(process.env.GENERATE_PEER_PORT === 'true'){
+    
     PEER_PORT = HTTP_PORT + Math.ceil(Math.random() * 1000);
 }
 
