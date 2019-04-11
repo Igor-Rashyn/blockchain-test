@@ -1,16 +1,20 @@
 class TransactionPool {
-    constructor(){
+    constructor() {
         this.transactionMap = {};
     }
 
-    setTransaction(transaction){
+    setTransaction(transaction) {
         this.transactionMap[transaction.id] = transaction;
     }
 
-    existingTransaction({ inputAddress }){
+    existingTransaction({ inputAddress }) {
         const transactions = Object.values(this.transactionMap);
 
         return transactions.find(transaction => transaction.input.address === inputAddress);
+    }
+
+    setMap(transactionMap) {
+        this.transactionMap = transactionMap;
     }
 }
 
